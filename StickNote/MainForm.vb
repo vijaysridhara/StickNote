@@ -18,10 +18,6 @@ Public Class MainForm
 
     Private Sub MainForm_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         On Error Resume Next
-        'Call UnregisterHotKey(Me.Handle.ToInt32, &HA000&)
-        'Call UnregisterHotKey(Me.Handle.ToInt32, &HA001&)
-        'Call UnregisterHotKey(Me.Handle.ToInt32, &HA002&)
-        'Call UnregisterHotKey(Me.Handle.ToInt32, &HA003&)
 
         Dim sw As IO.StreamWriter
         sw = New IO.StreamWriter(ACTIVENOTEPATH, False)
@@ -55,9 +51,15 @@ Public Class MainForm
         End If
 
         If IO.File.Exists(STICKYNOTEDB) = False Then
-
-            Dim br As BinaryWriter = New BinaryWriter(New IO.FileStream(STICKYNOTEDB, IO.FileMode.CreateNew))
+            Dim fs As New FileStream(STICKYNOTEDB, IO.FileMode.CreateNew)
+            Dim br As BinaryWriter = New BinaryWriter(fs)
             br.Write(My.Resources.sn)
+            br.Close()
+            br.Dispose()
+            fs.Close()
+            fs.Dispose()
+            MsgBox("I created the notes DB under " & STICKYNOTEPATH & vbCrLf & "I will restart the application now", MsgBoxStyle.Information)
+            Application.Restart()
         End If
         With nicMain
             .ContextMenuStrip = mnuMain
@@ -75,24 +77,7 @@ Public Class MainForm
         If My.Settings.ActiveNotesAtStartup Then
             ShowActiveNotes()
         End If
-        'bCancel = False
-        'Dim m As HotkeyModifierFlags
-        ''register the Ctrl-F hotkey
-        'If RegisterHotKey(Me.Handle.ToInt32, &HA000&, m.MOD_CONTROL And m.MOD_SHIFT, Keys.N) = 0 Then
-        '    MsgBox("Couldn't register hotkey for <New note>", MsgBoxStyle.Information Or MsgBoxStyle.Exclamation)
-        'End If
-        'If RegisterHotKey(Me.Handle.ToInt32, &HA001&, m.MOD_CONTROL And m.MOD_SHIFT, Keys.C) = 0 Then
-        '    MsgBox("Couldn't register hotkey for <Close all notes>", MsgBoxStyle.Information Or MsgBoxStyle.Exclamation)
-        'End If
 
-        'If RegisterHotKey(Me.Handle.ToInt32, &HA002&, m.MOD_CONTROL And m.MOD_SHIFT, Keys.H) = 0 Then
-        '    MsgBox("Couldn't register hotkey for <Hide all notes>", MsgBoxStyle.Information Or MsgBoxStyle.Exclamation)
-        'End If
-        'If RegisterHotKey(Me.Handle.ToInt32, &HA003&, m.MOD_CONTROL And m.MOD_SHIFT, Keys.S) = 0 Then
-        '    MsgBox("Couldn't register hotkey for <Show all notes>", MsgBoxStyle.Information Or MsgBoxStyle.Exclamation)
-        'End If
-
-        'ProcessMessages()
     End Sub
     Private Sub ShowActiveNotes()
         If IO.File.Exists(ACTIVENOTEPATH) = False Then
@@ -163,15 +148,6 @@ Public Class MainForm
         Next
     End Sub
 
-    'Private Sub CloseallnotesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CloseallnotesToolStripMenuItem.Click
-    '    On Error Resume Next
-    '    Dim frm As Form
-    '    For Each frm In Application.OpenForms
-    '        If TypeOf frm Is Post Then
-    '            frm.Close()
-    '        End If
-    '    Next
-    'End Sub
 
     Private Sub ShowactivenotesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ShowactivenotesToolStripMenuItem.Click
         ShowActiveNotes()
